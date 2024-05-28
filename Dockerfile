@@ -30,4 +30,4 @@ ENV USE_HTTPS_REDIRECTION=false
 EXPOSE 80
 
 # Set the entry point for the container
-ENTRYPOINT ["dotnet", "CareerShotApi.dll"]
+ENTRYPOINT ["dotnet", "RetrieveUserInfoAPI.dll"]
