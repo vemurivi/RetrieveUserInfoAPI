@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  careershotapi:
+    image: <your-acr-login-server>/careershotapi:latest
+    container_name: careershotapi
+    ports:
+      - "8081:80"
+    environment:
+      - BlobServiceEndpoint=${BlobServiceEndpoint}
+      - BlobServiceSasToken=${BlobServiceSasToken}
+      - StorageAccountConnectionString=${StorageAccountConnectionString}
+
+  retrieveuserinfoapi:
+    image: <your-acr-login-server>/retrieveuserinfoapi:latest
+    container_name: retrieveuserinfoapi
+    ports:
+      - "8082:80"
+    environment:
+      - BlobServiceEndpoint=${BlobServiceEndpoint}
+      - BlobServiceSasToken=${BlobServiceSasToken}
+      - StorageAccountConnectionString=${StorageAccountConnectionString}
