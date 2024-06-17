@@ -99,32 +99,42 @@ var tableClient = tableServiceClient.GetTableClient("careershotinformation");
 
 app.MapGet("/api/user", [Authorize] async (string name) =>
 {
-    var partitionKey = name.Substring(0, 1).ToUpper();
+    // Normalize the input name
+    var normalizedRowKey = name.ToLower().Replace(" ", "");
+
     try
     {
-        var userData = await tableClient.GetEntityAsync<UserData>(partitionKey, name);
+        // Search for the user in the table
+        var entities = tableClient.Query<UserData>(filter: $"RowKey eq '{normalizedRowKey}'");
+
+        var userData = entities.FirstOrDefault();
+
+        if (userData == null)
+        {
+            return Results.NotFound("User not found");
+        }
 
         var blobContainerClient = blobServiceClient.GetBlobContainerClient("media-dev");
-        var photoBlobClient = blobContainerClient.GetBlobClient($"{name}.jpg"); // Assuming photo is saved as name.jpg
-        var resumeBlobClient = blobContainerClient.GetBlobClient($"{name}.pdf"); // Assuming resume is saved as name.pdf
+        var photoBlobClient = blobContainerClient.GetBlobClient($"{userData.RowKey}.jpg"); // Assuming photo is saved as RowKey.jpg
+        var resumeBlobClient = blobContainerClient.GetBlobClient($"{userData.RowKey}.pdf"); // Assuming resume is saved as RowKey.pdf
 
         var photoUrl = photoBlobClient.Uri.ToString();
         var resumeUrl = resumeBlobClient.Uri.ToString();
 
         return Results.Ok(new
         {
-            userData.Value.Name,
-            userData.Value.Description,
-            userData.Value.LinkedIn,
-            userData.Value.GitHub,
-            userData.Value.Skills,
+            userData.Name,
+            userData.Description,
+            userData.LinkedIn,
+            userData.GitHub,
+            userData.Skills,
             PhotoUrl = photoUrl,
             ResumeUrl = resumeUrl
         });
     }
     catch (RequestFailedException)
     {
-        return Results.NotFound("User not found");
+        return Results.StatusCode(500, "Internal server error");
     }
 })
 .WithName("GetUserData");
