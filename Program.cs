@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using System.Text;
+using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -134,7 +135,7 @@ app.MapGet("/api/user", [Authorize] async (string name) =>
     }
     catch (RequestFailedException)
     {
-        return Results.StatusCode(500, "Internal server error");
+        return Results.StatusCode(500);
     }
 })
 .WithName("GetUserData");
