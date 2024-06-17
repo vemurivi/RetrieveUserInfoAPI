@@ -81,6 +81,8 @@ if (useHttpsRedirection)
     app.UseHttpsRedirection();
 }
 
+app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -89,9 +91,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-
-app.UseRouting();
 
 // Retrieve Blob and Table clients from DI
 var blobServiceClient = app.Services.GetRequiredService<BlobServiceClient>();
