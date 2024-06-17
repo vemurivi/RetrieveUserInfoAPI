@@ -102,11 +102,12 @@ app.MapGet("/api/user", [Authorize] async (string name) =>
 {
     // Normalize the input name
     var normalizedRowKey = name.ToLower().Replace(" ", "");
+    var partitionKey = name.Substring(0, 1).ToUpper();
 
     try
     {
         // Search for the user in the table
-        var entities = tableClient.Query<UserData>(filter: $"RowKey eq '{normalizedRowKey}'");
+        var entities = tableClient.Query<UserData>(filter: $"PartitionKey eq '{partitionKey}' and RowKey eq '{normalizedRowKey}'");
 
         var userData = entities.FirstOrDefault();
 
@@ -116,8 +117,8 @@ app.MapGet("/api/user", [Authorize] async (string name) =>
         }
 
         var blobContainerClient = blobServiceClient.GetBlobContainerClient("media-dev");
-        var photoBlobClient = blobContainerClient.GetBlobClient($"{userData.RowKey}.jpg"); // Assuming photo is saved as RowKey.jpg
-        var resumeBlobClient = blobContainerClient.GetBlobClient($"{userData.RowKey}.pdf"); // Assuming resume is saved as RowKey.pdf
+        var photoBlobClient = blobContainerClient.GetBlobClient($"{normalizedRowKey}.jpg"); // Assuming photo is saved as normalizedRowKey.jpg
+        var resumeBlobClient = blobContainerClient.GetBlobClient($"{normalizedRowKey}.pdf"); // Assuming resume is saved as normalizedRowKey.pdf
 
         var photoUrl = photoBlobClient.Uri.ToString();
         var resumeUrl = resumeBlobClient.Uri.ToString();
