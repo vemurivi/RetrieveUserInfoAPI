@@ -123,8 +123,8 @@ app.MapGet("/api/user", [Authorize] async (HttpContext httpContext) =>
         }
 
         var blobContainerClient = blobServiceClient.GetBlobContainerClient("media-dev");
-        var photoBlobClient = blobContainerClient.GetBlobClient($"{normalizedName}.jpg"); // Assuming photo is saved as RowKey.jpg
-        var resumeBlobClient = blobContainerClient.GetBlobClient($"{normalizedName.RowKey}.pdf"); // Assuming resume is saved as RowKey.pdf
+        var photoBlobClient = blobContainerClient.GetBlobClient($"{normalizedName}.jpg"); // Assuming photo is saved as normalizedName.jpg
+        var resumeBlobClient = blobContainerClient.GetBlobClient($"{normalizedName}.pdf"); // Assuming resume is saved as normalizedName.pdf
 
         var photoUrl = photoBlobClient.Uri.ToString();
         var resumeUrl = resumeBlobClient.Uri.ToString();
@@ -142,7 +142,7 @@ app.MapGet("/api/user", [Authorize] async (HttpContext httpContext) =>
     }
     catch (RequestFailedException ex)
     {
-        return Results.Problem("Error querying storage", statusCode: 500, detail: ex.Message);
+        return Results.Problem(detail: ex.Message, statusCode: 500);
     }
 })
 .WithName("GetUserData");
