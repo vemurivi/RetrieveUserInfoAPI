@@ -123,8 +123,8 @@ app.MapGet("/api/user", [Authorize] async (HttpContext httpContext) =>
         }
 
         var blobContainerClient = blobServiceClient.GetBlobContainerClient("media-dev");
-        var photoBlobClient = blobContainerClient.GetBlobClient($"{userData.RowKey}.jpg"); // Assuming photo is saved as RowKey.jpg
-        var resumeBlobClient = blobContainerClient.GetBlobClient($"{userData.RowKey}.pdf"); // Assuming resume is saved as RowKey.pdf
+        var photoBlobClient = blobContainerClient.GetBlobClient($"{normalizedName}.jpg"); // Assuming photo is saved as RowKey.jpg
+        var resumeBlobClient = blobContainerClient.GetBlobClient($"{normalizedName.RowKey}.pdf"); // Assuming resume is saved as RowKey.pdf
 
         var photoUrl = photoBlobClient.Uri.ToString();
         var resumeUrl = resumeBlobClient.Uri.ToString();
