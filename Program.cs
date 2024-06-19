@@ -142,7 +142,7 @@ app.MapGet("/api/user", [Authorize] async (HttpContext httpContext) =>
     }
     catch (RequestFailedException ex)
     {
-        return Results.StatusCode(500, $"Error querying storage: {ex.Message}");
+        return Results.Problem("Error querying storage", statusCode: 500, detail: ex.Message);
     }
 })
 .WithName("GetUserData");
