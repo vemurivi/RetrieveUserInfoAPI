@@ -122,7 +122,7 @@ app.MapGet("/api/user", [Authorize] async (HttpContext httpContext) =>
             return Results.NotFound("User not found");
         }
 
-        var blobContainerClient = blobServiceClient.GetBlobContainerClient("media-dev");
+        var blobContainerClient = blobServiceClient.GetBlobContainerClient("mediadev");
         var photoBlobClient = blobContainerClient.GetBlobClient($"{normalizedName}.jpg"); // Assuming photo is saved as normalizedName.jpg
         var resumeBlobClient = blobContainerClient.GetBlobClient($"{normalizedName}.pdf"); // Assuming resume is saved as normalizedName.pdf
 
