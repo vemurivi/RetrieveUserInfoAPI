@@ -122,12 +122,30 @@ app.MapGet("/api/user", [Authorize] async (HttpContext httpContext) =>
             return Results.NotFound("User not found");
         }
 
-        var blobContainerClient = blobServiceClient.GetBlobContainerClient("mediadev");
-        var photoBlobClient = blobContainerClient.GetBlobClient($"{normalizedName}.jpg"); // Assuming photo is saved as normalizedName.jpg
-        var resumeBlobClient = blobContainerClient.GetBlobClient($"{normalizedName}.pdf"); // Assuming resume is saved as normalizedName.pdf
+        var blobContainerClient = blobServiceClient.GetBlobContainerClient("media-dev");
 
-        var photoUrl = photoBlobClient.Uri.ToString();
-        var resumeUrl = resumeBlobClient.Uri.ToString();
+        string[] possiblePhotoExtensions = { "jpg", "jpeg", "png" };
+        string photoUrl = null;
+
+        foreach (var ext in possiblePhotoExtensions)
+        {
+            var blobClient = blobContainerClient.GetBlobClient($"{normalizedName}.{ext}");
+            if (await blobClient.ExistsAsync())
+            {
+                photoUrl = new UriBuilder(blobClient.Uri) { Query = null }.ToString();
+                break;
+            }
+        }
+
+        if (photoUrl == null)
+        {
+            return Results.NotFound("Photo not found");
+        }
+
+        var resumeBlobClient = blobContainerClient.GetBlobClient($"{normalizedName}.pdf");
+
+        // Construct the base URL without query parameters
+        var resumeUrl = new UriBuilder(resumeBlobClient.Uri) { Query = null }.ToString();
 
         return Results.Ok(new
         {
