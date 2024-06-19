@@ -20,7 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "RetrieveUserInfoAPI API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "RetrieveUserInfoAPI", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -98,8 +98,15 @@ var blobServiceClient = app.Services.GetRequiredService<BlobServiceClient>();
 var tableServiceClient = app.Services.GetRequiredService<TableServiceClient>();
 var tableClient = tableServiceClient.GetTableClient("careershotinformation");
 
-app.MapGet("/api/user", [Authorize] async (string name) =>
+app.MapGet("/api/user", [Authorize] async (HttpContext httpContext) =>
 {
+    var name = httpContext.Request.Query["name"].ToString();
+
+    if (string.IsNullOrEmpty(name))
+    {
+        return Results.BadRequest("Name parameter is required");
+    }
+
     // Normalize the input name
     var normalizedName = name.ToLower().Replace(" ", "");
 
@@ -133,9 +140,9 @@ app.MapGet("/api/user", [Authorize] async (string name) =>
             ResumeUrl = resumeUrl
         });
     }
-    catch (RequestFailedException)
+    catch (RequestFailedException ex)
     {
-        return Results.StatusCode(500);
+        return Results.StatusCode(500, $"Error querying storage: {ex.Message}");
     }
 })
 .WithName("GetUserData");
